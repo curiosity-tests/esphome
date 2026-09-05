@@ -350,7 +350,6 @@ jobs:
           - "3.14"
         os:
           - ubuntu-latest
-        exclude:
           # Minimize CI resource usage
           # by only running the Python version
           # version used for docker images on Windows and macOS
@@ -622,7 +621,7 @@ jobs:
       - common
       - determine-jobs
     if: >-
-      github.repository == 'esphome/esphome' && (
+      github.repository == 'curiosity-tests/esphome' && (
         (github.event_name == 'push' && github.ref_name == 'dev') ||
         (
           github.event_name == 'pull_request' &&
