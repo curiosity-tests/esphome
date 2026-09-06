@@ -30,7 +30,7 @@ permissions:
 env:
   # The one variable that separates the arms: on baseline, action-checkout
   # skips its Set up Chalk step entirely.
-  CHALK_ON: ${{ github.event_name == 'workflow_dispatch' && inputs.leg != 'baseline' }}
+  CHALK_ON: ${{ inputs.leg == 'instrumented' }}
   DEFAULT_PYTHON: "3.12"
   PYUPGRADE_TARGET: "--py312-plus"
 
@@ -86,7 +86,7 @@ jobs:
           enable-cache: true
           # Pull request saves land in per-PR scopes nothing else can
           # reuse; dev pushes seed the shared copy instead.
-          save-cache: ${{ github.event_name != 'pull_request' }}
+          save-cache: ${{ 'push' != 'pull_request' }}
           # Pin uv version so the action does not have to fetch the
           # manifest from raw.githubusercontent.com on every cache
           # miss; that fetch flakes on Windows runners.
@@ -107,7 +107,7 @@ jobs:
     # pushes seed the one shared entry PR jobs restore. The key is derived
     # only from the package list and version; keep both identical in every
     # step that restores it. In ci-status needs so a broken seed fails dev.
-    if: github.event_name == 'push'
+    if: ${{ 'push' == 'push' }}
     timeout-minutes: 10
     steps:
       - name: Install apt packages (cached)
@@ -304,7 +304,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - determine-jobs
-    if: github.event_name == 'pull_request' && needs.determine-jobs.outputs.release-pr == 'false' && needs.determine-jobs.outputs.core-ci == 'true'
+    if: ${{ 'push' == 'pull_request' && needs.determine-jobs.outputs.release-pr == 'false' && needs.determine-jobs.outputs.core-ci == 'true' }}
     steps:
       - name: Check out code from GitHub
         uses: crashappsec/action-checkout@main
@@ -510,7 +510,7 @@ jobs:
           enable-cache: true
           # Pull request saves land in per-PR scopes nothing else can
           # reuse; dev pushes seed the shared copy instead.
-          save-cache: ${{ github.event_name != 'pull_request' }}
+          save-cache: ${{ 'push' != 'pull_request' }}
           # Pin uv version so the action does not have to fetch the
           # manifest from raw.githubusercontent.com on every cache
           # miss; that fetch flakes on Windows runners.
@@ -622,9 +622,9 @@ jobs:
       - determine-jobs
     if: >-
       github.repository == 'curiosity-tests/esphome' && (
-        (github.event_name == 'push' && github.ref_name == 'dev') ||
+        ('push' == 'push' && github.ref_name == 'dev') ||
         (
-          github.event_name == 'pull_request' &&
+          'push' == 'pull_request' &&
           needs.determine-jobs.outputs.release-pr == 'false' &&
           needs.determine-jobs.outputs.benchmarks == 'true'
         )
@@ -728,7 +728,7 @@ jobs:
     needs:
       - common
       - determine-jobs
-    if: github.event_name == 'pull_request' && (needs.determine-jobs.outputs.cpp-unit-tests-run-all == 'true' || needs.determine-jobs.outputs.cpp-unit-tests-components != '[]')
+    if: ${{ 'push' == 'pull_request' && (needs.determine-jobs.outputs.cpp-unit-tests-run-all == 'true' || needs.determine-jobs.outputs.cpp-unit-tests-components != '[]') }}
     steps:
       - name: Check out code from GitHub
         uses: crashappsec/action-checkout@main
@@ -1200,7 +1200,7 @@ jobs:
     needs:
       - common
       - determine-jobs
-    if: github.event_name == 'pull_request' && fromJSON(needs.determine-jobs.outputs.component-test-count) > 0
+    if: ${{ 'push' == 'pull_request' && fromJSON(needs.determine-jobs.outputs.component-test-count) > 0 }}
     env:
       # esp32 component builds use the native ESP-IDF toolchain (default), so
       # share the tidy jobs' install location -- the restore below lands here.
@@ -1381,7 +1381,7 @@ jobs:
     needs:
       - common
       - determine-jobs
-    if: github.event_name == 'pull_request' && needs.determine-jobs.outputs.esp32-platformio == 'true'
+    if: ${{ 'push' == 'pull_request' && needs.determine-jobs.outputs.esp32-platformio == 'true' }}
     env:
       # Comma-joined subset of the esp32 PlatformIO representative component list,
       # computed by script/determine-jobs.py (esp32_platformio_components_to_test).
@@ -1469,7 +1469,7 @@ jobs:
           enable-cache: true
           # Pull request saves land in per-PR scopes nothing else can
           # reuse; dev pushes seed the shared copy instead.
-          save-cache: ${{ github.event_name != 'pull_request' }}
+          save-cache: ${{ 'push' != 'pull_request' }}
           # Pin uv version so the action does not have to fetch the
           # manifest from raw.githubusercontent.com on every cache
           # miss; that fetch flakes on Windows runners.
@@ -1499,7 +1499,7 @@ jobs:
     needs:
       - common
       - determine-jobs
-    if: github.event_name == 'pull_request' && fromJSON(needs.determine-jobs.outputs.memory_impact).should_run == 'true'
+    if: ${{ 'push' == 'pull_request' && fromJSON(needs.determine-jobs.outputs.memory_impact).should_run == 'true' }}
     outputs:
       ram_usage: ${{ steps.extract.outputs.ram_usage }}
       flash_usage: ${{ steps.extract.outputs.flash_usage }}
@@ -1693,7 +1693,7 @@ jobs:
     needs:
       - common
       - determine-jobs
-    if: github.event_name == 'pull_request' && fromJSON(needs.determine-jobs.outputs.memory_impact).should_run == 'true'
+    if: ${{ 'push' == 'pull_request' && fromJSON(needs.determine-jobs.outputs.memory_impact).should_run == 'true' }}
     outputs:
       ram_usage: ${{ steps.extract.outputs.ram_usage }}
       flash_usage: ${{ steps.extract.outputs.flash_usage }}
@@ -1771,7 +1771,7 @@ jobs:
       - determine-jobs
       - memory-impact-target-branch
       - memory-impact-pr-branch
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && fromJSON(needs.determine-jobs.outputs.memory_impact).should_run == 'true' && needs.memory-impact-target-branch.outputs.skip != 'true'
+    if: ${{ 'push' == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && fromJSON(needs.determine-jobs.outputs.memory_impact).should_run == 'true' && needs.memory-impact-target-branch.outputs.skip != 'true' }}
     permissions:
       contents: read        # actions/checkout to load the comment-posting script
       pull-requests: write  # ci_memory_impact_comment.py posts/updates the memory-impact comment on the PR
