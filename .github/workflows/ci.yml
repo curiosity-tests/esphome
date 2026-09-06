@@ -621,7 +621,7 @@ jobs:
       - common
       - determine-jobs
     if: >-
-      github.repository == 'curiosity-tests/esphome' && (
+      github.repository == 'esphome/esphome' && (
         ('push' == 'push' && github.ref_name == 'dev') ||
         (
           'push' == 'pull_request' &&
