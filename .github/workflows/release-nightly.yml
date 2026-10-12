@@ -6,8 +6,7 @@ name: Nightly Dev Release
 # fixed when the run starts and cannot read a file or the current date.
 
 on:
-  schedule:
-    - cron: "0 2 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read  # actions/checkout to read the version from esphome/const.py

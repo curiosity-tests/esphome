@@ -2,8 +2,6 @@
 name: Stale
 
 on:
-  schedule:
-    - cron: "30 0 * * *"
   workflow_dispatch:
 
 # The reusable workflow authenticates as the ESPHome GitHub App, so GITHUB_TOKEN

@@ -13,8 +13,6 @@ name: "CodeQL Advanced"
 
 on:
   workflow_dispatch:
-  schedule:
-  - cron: "30 18 * * 4"
 
 # Deny by default; the analyze job opts in to exactly what it needs.
 permissions: {}

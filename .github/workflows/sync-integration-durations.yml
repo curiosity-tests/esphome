@@ -3,8 +3,6 @@ name: Refresh integration test durations
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "45 5 * * 1"
 
 # Repo writes (branch push, PR open) happen via the App token minted below,
 # so the workflow's GITHUB_TOKEN does not need any write scopes.

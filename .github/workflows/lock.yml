@@ -2,8 +2,6 @@
 name: Lock closed issues and PRs
 
 on:
-  schedule:
-    - cron: "30 0 * * *"  # Run daily at 00:30 UTC
   workflow_dispatch:
 
 # Deny by default; the lock job opts in to exactly what the reusable workflow needs.
